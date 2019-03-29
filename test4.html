@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <link rel="stylesheet" href="./ol.css"" type="text/css">
+      <link rel="stylesheet" href="https://unpkg.com/ol-popup@4.0.0/src/ol-popup.css" />
+      <script src="./ol.js"></script>
+      <script src="https://unpkg.com/ol-popup@4.0.0"></script>
+    <style>
+      /* Set the size of the div element that contains the map */
+      #map {
+       height: 100%;  /* The height is 400 pixels */
+       width: 100%;  /* The width is the width of the web page */
+      }
+      html, body {
+       height: 100%;
+       margin: 0;
+       padding: 0;
+      }
+      #popup {
+        padding-bottom: 15px;
+      }
+   </style>
+   
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+		//google.maps.event.addDomListener(window, 'load', initMap);
+		//google.maps.event.addDomListener(window, 'load', initMap);
+	  google.load('visualization', '1.0', {'packages':['corechart']});
+	</script>
+    <title>OpenLayers example</title>
+  </head>
+  <body>
+    <h2>My Map</h2>
+    <div id="map" class="map">
+        <div id="popup"></div>
+    </div>
+    <script type="text/javascript">
+      var vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            url: './map.geojson'
+        }),
+        style: new ol.style.Style({
+            image: new ol.style.Circle( /** @type {olx.style.IconOptions} */ ({
+                radius: 10,
+                fill: new ol.style.Fill({
+                    color: '#ffff00'
+                })
+            }))
+        })
+      });
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-118.44172596931456,34.07389279840181]),
+          zoom: 15
+        })
+      });
+      map.addLayer(vectorLayer);  
+
+      var popup = new Popup();
+      map.addOverlay(popup);
+
+      map.on('click', function (evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel,
+        function (feature, layer) {
+            return feature;
+        });
+        console.log(feature)
+        if (feature) {
+            var geometry = feature.getGeometry();
+            var coord = geometry.getCoordinates();
+            //var content= feature.get('title');
+            //var coord = geometry.getCoordinates();
+            //var content = '<h3>' + feature.get('title') + '</h3>';
+            //content += '<h5>' + feature.get('description') + '</h5>'; 
+            //console.log(content)
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Topping');
+            data.addColumn('number', 'Meters');
+            data.addRows([
+            ['07:00', feature.get('07:00 am')],
+            ['08:00', feature.get('08:00 am')],
+            ['09:00', feature.get('09:00 am')],
+            ['10:00', feature.get('10:00 am')],
+            ['11:00', feature.get('11:00 am')]
+            ]);
+            //console.log(data)
+            var options = {'title':'How Much Pizza I Ate Last Night',
+                     'width':400,
+                     'height':300};
+            var node        = document.createElement('chart_div')
+			var chart       = new google.visualization.LineChart(node);
+            chart.draw(data, options);
+            console.log(node)	
+           // popup.setOffset([0, -22]);
+            
+            //Popup.source = node
+            popup.show(data);
+        }
+      });
+    </script>
+  </body>
+</html>
