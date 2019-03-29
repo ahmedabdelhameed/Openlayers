@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+    <style>
+      /* Set the size of the div element that contains the map */
+      #map {
+       height: 100%;  /* The height is 400 pixels */
+       width: 100%;  /* The width is the width of the web page */
+      }
+      html, body {
+       height: 100%;
+       margin: 0;
+       padding: 0;
+      }
+      #popup {
+        padding-bottom: 15px;
+      }
+   </style>
+   
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>OpenLayers example</title>
+  </head>
+  <body>
+    <h2>My Map</h2>
+    <div id="map" class="map">
+        <div id="popup"></div>
+    </div>
+    <script type="text/javascript">
+      var vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            url: './map.geojson'
+        }),
+        style: new ol.style.Style({
+            image: new ol.style.Circle( /** @type {olx.style.IconOptions} */ ({
+                radius: 10,
+                fill: new ol.style.Fill({
+                    color: '#ffff00'
+                })
+            }))
+        })
+      });
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-118.44172596931456,34.07389279840181]),
+          zoom: 15
+        })
+      });
+      map.addLayer(vectorLayer);  
+    </script>
+  </body>
+</html>
